@@ -1,0 +1,10 @@
+[Unit]
+Description=ReachLED service
+
+[Service]
+Type=dbus
+BusName=led.service
+ExecStart=/home/reach/DBUS_deamon/reach-led/led_service.py
+
+[Install]
+WantedBy=multi-user.target

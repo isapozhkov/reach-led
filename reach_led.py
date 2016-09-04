@@ -4,7 +4,7 @@ class ReachLED(object):
     @staticmethod
     def get_access_to_led():
         try:
-            bus = dbus.SessionBus()
+            bus = dbus.SystemBus()
             the_object = bus.get_object("led.service", "/led/service")
             return dbus.Interface(the_object, "led.service")
         except dbus.exceptions.DBusException as error:

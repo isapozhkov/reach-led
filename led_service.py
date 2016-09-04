@@ -12,7 +12,7 @@ from ReachLED import ReachLED
 class LEDService(dbus.service.Object):
     def __init__(self):
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-        self.bus_name = dbus.service.BusName("led.service", dbus.SessionBus())
+        self.bus_name = dbus.service.BusName("led.service", dbus.SystemBus())
         dbus.service.Object.__init__(self, self.bus_name, "/led/service")
         self.mainloop = GObject.MainLoop()
         self.led = ReachLED()
@@ -35,6 +35,6 @@ class LEDService(dbus.service.Object):
 
 
 if __name__ == "__main__":
-
+    
     service = LEDService()
     service.run()
