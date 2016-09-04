@@ -3,8 +3,8 @@ After installation you can use LED wherever you want. All commands will be synch
 
 ####Install:
   - `make install`
-  - copy led.service.conf to `/etc/dbus-1/system.d/`
-  - enable and start reachled.service
+  - copy `app/led.service.conf` to `/etc/dbus-1/system.d/`
+  - enable and start `app/reachled.service`
 
 ####Usage:
  - `set_color(color)`
