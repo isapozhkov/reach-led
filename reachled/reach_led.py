@@ -135,20 +135,3 @@ class ReachLED(object):
             for color in colors:
                 self.set_color(color)
                 time.sleep(delay)
-
-if __name__ == "__main__":
-    led = ReachLED()
-
-    if not led.initialize():
-        sys.exit()
-    
-    if len(sys.argv) < 2:
-        print "Usage: {} color".format(sys.argv[0])
-
-        print "Colors:"
-        for color in led.colors_dict.keys():
-            print "\t", color
-    else:
-        if not led.set_color(sys.argv[1]):
-            print("Can't set this color. You may add this in the colors_dict variable.")
-        sys.exit()

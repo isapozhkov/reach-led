@@ -1,10 +1,10 @@
 ###LED for Reach
-After installation you can use ReachLED whereever you want. All commands will be synchronized.
+After installation you can use LED wherever you want. All commands will be synchronized.
 
 ####Install:
+  - `make install`
   - copy led.service.conf to `/etc/dbus-1/system.d/`
   - enable and start reachled.service
-  - `make install`
 
 ####Usage:
  - `set_color(color)`
@@ -12,7 +12,7 @@ After installation you can use ReachLED whereever you want. All commands will be
  - `stop_blinker()`
 
 ```
-from reachled import ReachLED
+from reachled import LED
 
-ReachLED.set_color("red")
+LED.set_color("red")
 ```

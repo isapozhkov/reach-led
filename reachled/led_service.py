@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import dbus
 import dbus.service
 import dbus.mainloop.glib
@@ -32,9 +30,3 @@ class LEDService(dbus.service.Object):
     @dbus.service.method("led.service")
     def stop_blinker(self):
         self.led.stop_blinker()
-
-
-if __name__ == "__main__":
-    
-    service = LEDService()
-    service.run()

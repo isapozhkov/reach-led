@@ -1,6 +1,6 @@
 import dbus
 
-class ReachLED(object):
+class LED(object):
     @staticmethod
     def get_access_to_led():
         try:
@@ -30,4 +30,3 @@ class ReachLED(object):
         led = ReachLED.get_access_to_led()
         if led is not None:
             led.stop_blinker()
-
