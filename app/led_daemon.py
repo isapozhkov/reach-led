@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from reachled import LEDService
 
 if __name__ == "__main__":

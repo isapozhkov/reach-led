@@ -5,7 +5,7 @@ try:
     from gi.repository import GObject
 except ImportError:
     import gobject as GObject
-from ReachLED import ReachLED
+from reach_led import ReachLED
 
 class LEDService(dbus.service.Object):
     def __init__(self):

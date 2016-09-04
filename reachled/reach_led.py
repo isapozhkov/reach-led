@@ -25,7 +25,7 @@ import os
 import sys
 import time
 from multiprocessing import Process
-from GPIO import GPIO
+from gpio import GPIO
 
 class ReachLED(object):
 
