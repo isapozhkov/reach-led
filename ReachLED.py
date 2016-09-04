@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 # ReachView code is placed under the GPL license.
 # Written by Egor Fedorov (egor.fedorov@emlid.com)
 # Copyright (c) 2015, Emlid Limited
@@ -53,117 +51,104 @@ class ReachLED(object):
 
         self.pwm_channels = [0, 1, 2] # red, green, blue
 
-        # first, we need to change the pin's pinmux to mode1
-        for pin in self.pins:
-            pin.setPinmux("mode1")
+    def initialize(self):
+        try:
+            #first, we need to change the pin's pinmux to mode1
+            for pin in self.pins:
+                pin.setPinmux("mode1")
 
-        # then, export the 3 pwn channels if needed
-        for ch in self.pwm_channels:
-            if not os.path.exists(self.pwm_prefix + "/pwm" + str(ch)):
-                with open(self.pwm_prefix + "export", "w") as f:
-                    f.write(str(ch))
+            #then, export the 3 pwn channels if needed
+            for ch in self.pwm_channels:
+                if not os.path.exists(self.pwm_prefix + "/pwm" + str(ch)):
+                    with open(self.pwm_prefix + "export", "w") as f:
+                        f.write(str(ch))
 
-        # enable all of the channels
-        for ch in self.pwm_channels:
-            with open(self.pwm_prefix + "pwm" + str(ch) + "/enable", "w") as f:
-                f.write("1")
+            #enable all of the channels
+            for ch in self.pwm_channels:
+                with open(self.pwm_prefix + "pwm" + str(ch) + "/enable", "w") as f:
+                    f.write("1")
 
-        # set period
-        for ch in self.pwm_channels:
-            with open(self.pwm_prefix + "pwm" + str(ch) + "/period", "w") as f:
-                f.write("1000000")
+            #set period
+            for ch in self.pwm_channels:
+                with open(self.pwm_prefix + "pwm" + str(ch) + "/period", "w") as f:
+                    f.write("1000000")
+        except IOError as error:
+            print error
+            return False
+        
+        return True
 
 
-    def setDutyCycle(self, channel, percentage=100):
-        # 0% = 1000000
-        # 100% = 0
+    def set_duty_cycle(self, channel, percentage=100):
+        #0% = 1000000
+        #100% = 0
+        duty_value = int((100 - percentage) * 10000)
 
-        duty_value = (100 - percentage) * 10000
+        try:
+            with open(self.pwm_prefix + "pwm" + str(channel) + "/duty_cycle", "w") as f: 
+                f.write(str(duty_value))
+        except IOError as error:
+            print error
+            return False
+        
+        return True
 
-        with open(self.pwm_prefix + "pwm" + str(channel) + "/duty_cycle", "w") as f:
-            f.write(str(duty_value))
-
-    def setColor(self, color, power_percentage=100):
+    def set_color(self, color, power_percentage=100):
         if color in self.colors_dict.keys():
             for channel in self.pwm_channels:
-                self.setDutyCycle(channel, self.colors_dict[color][channel] * power_percentage)
+                if not self.set_duty_cycle(channel, self.colors_dict[color][channel]*power_percentage):
+                    return False
             return True
         else:
             return False
 
-    def startBlinker(self, pattern, delay=0.5):
-    	# pattern example: "red,blue,off"
-
-	if pattern:
+    def start_blinker(self, pattern, delay=0.5):
+    	#pattern example: "red,blue,off"
+        if pattern:
     	    for color in pattern.split(","):
-    		if color not in self.colors_dict:
-    		    return False
+                if color not in self.colors_dict.keys():
+                    return False
     	else:
     	    return False
 
     	if self.blinker_process is not None:
-    	    self.stopBlinker()
+    	    self.stop_blinker()
 
         if self.blinker_process is None:
-            self.blinker_process = Process(target = self.blinkPattern, args = (pattern, delay))
+            self.blinker_process = Process(target=self.blink_pattern, args=(pattern, delay))
             self.blinker_process.start()
             return True
 
         return False
 
-    def stopBlinker(self):
+    def stop_blinker(self):
         if self.blinker_process is not None:
             self.blinker_process.terminate()
             self.blinker_process.join()
             self.blinker_process = None
 
-    def blinkPattern(self, pattern, delay=0.5):
-    	# pattern example: "red,blue,off"
-        
+    def blink_pattern(self, pattern, delay=0.5):
+    	#pattern example: "red,blue,off"
         colors =  pattern.split(",")
 
     	while True:
             for color in colors:
-                self.setColor(color)
+                self.set_color(color)
                 time.sleep(delay)
 
-def test():
-    led = ReachLED()
-    print("Starting...")
-    led.setDutyCycle(0, 0)
-
-    time.sleep(1)
-    print("After pause...")
-    print("Channel 0")
-    led.setDutyCycle(0, 100)
-    time.sleep(1)
-    print("Channel 1")
-    led.setDutyCycle(0, 0)
-    led.setDutyCycle(1, 100)
-    time.sleep(1)
-    print("Channel 2")
-    led.setDutyCycle(1, 0)
-    led.setDutyCycle(2, 100)
-    time.sleep(1)
-
 if __name__ == "__main__":
-    test()
     led = ReachLED()
 
+    if not led.initialize():
+        sys.exit()
+    
     if len(sys.argv) < 2:
         print "Usage: {} color".format(sys.argv[0])
 
         print "Colors:"
         for color in led.colors_dict.keys():
-        	print "\t", color
+            print "\t", color
     else:
-        if not led.setColor(sys.argv[1]):
+        if not led.set_color(sys.argv[1]):
             print("Can't set this color. You may add this in the colors_dict variable.")
-
-
-
-
-
-
-
-
+        sys.exit()
