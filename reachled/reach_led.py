@@ -34,7 +34,7 @@ class ReachLED(object):
     def __init__(self):
         self.pins = [GPIO(12), GPIO(13), GPIO(182)]
  
-        self.blinker_process = None
+        self.process = None
 
         self.colors_dict = {
             "off": [0, 0, 0],
@@ -49,26 +49,22 @@ class ReachLED(object):
             "weakred": [0.1, 0, 0]
         }
 
-        self.pwm_channels = [0, 1, 2] # red, green, blue
+        self.pwm_channels = [0, 1, 2] #red, green, blue
 
     def initialize(self):
         try:
-            #first, we need to change the pin's pinmux to mode1
             for pin in self.pins:
                 pin.setPinmux("mode1")
 
-            #then, export the 3 pwn channels if needed
             for ch in self.pwm_channels:
                 if not os.path.exists(self.pwm_prefix + "/pwm" + str(ch)):
                     with open(self.pwm_prefix + "export", "w") as f:
                         f.write(str(ch))
 
-            #enable all of the channels
             for ch in self.pwm_channels:
                 with open(self.pwm_prefix + "pwm" + str(ch) + "/enable", "w") as f:
                     f.write("1")
 
-            #set period
             for ch in self.pwm_channels:
                 with open(self.pwm_prefix + "pwm" + str(ch) + "/period", "w") as f:
                     f.write("1000000")
@@ -96,13 +92,37 @@ class ReachLED(object):
     def set_color(self, color, power_percentage=100):
         if color in self.colors_dict.keys():
             for channel in self.pwm_channels:
-                if not self.set_duty_cycle(channel, self.colors_dict[color][channel]*power_percentage):
+                if not self.set_duty_cycle(channel, self.colors_dict[color][channel]*\
+                        power_percentage):
                     return False
             return True
         else:
             return False
 
+    def pulse_color(self, color, delay=0.5):
+        number_of_steps = 100
+        step = 100 / number_of_steps #100 - power_percentage
+        delay = float(delay) / number_of_steps / 2
+
+        for brightness in xrange(0, 100+step, step):
+            if not self.set_color(color, brightness):
+                return False
+            time.sleep(delay)
+
+        for brightness in xrange(100, -step, -step):
+            if not self.set_color(color, brightness):
+                return False
+            time.sleep(delay)
+
+        return True
+
     def start_blinker(self, pattern, delay=0.5):
+        return self.__start(pattern, delay, self.blink_pattern)
+
+    def start_pulser(self, pattern, delay=0.5):
+        return self.__start(pattern, delay, self.pulse_pattern)
+
+    def __start(self, pattern, delay, function):
     	#pattern example: "red,blue,off"
         if pattern:
     	    for color in pattern.split(","):
@@ -111,27 +131,35 @@ class ReachLED(object):
     	else:
     	    return False
 
-    	if self.blinker_process is not None:
-    	    self.stop_blinker()
+        if self.process is not None:
+            self.stop()
 
-        if self.blinker_process is None:
-            self.blinker_process = Process(target=self.blink_pattern, args=(pattern, delay))
-            self.blinker_process.start()
+        if self.process is None:
+            self.process = Process(target=function, args=(pattern, delay))
+            self.process.start()
             return True
 
         return False
 
-    def stop_blinker(self):
-        if self.blinker_process is not None:
-            self.blinker_process.terminate()
-            self.blinker_process.join()
-            self.blinker_process = None
+    def stop(self):
+        if self.process is not None:
+            self.process.terminate()
+            self.process.join()
+            self.process = None
 
     def blink_pattern(self, pattern, delay=0.5):
-    	#pattern example: "red,blue,off"
         colors =  pattern.split(",")
 
     	while True:
             for color in colors:
                 self.set_color(color)
                 time.sleep(delay)
+
+    def pulse_pattern(self, pattern, delay=0.5):
+        colors =  pattern.split(",")
+
+        while True:
+            for color in colors:
+                self.pulse_color(color, delay)
+                time.sleep(0.1)
+

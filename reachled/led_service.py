@@ -20,13 +20,21 @@ class LEDService(dbus.service.Object):
             self.mainloop.run()
 
     @dbus.service.method("led.service")
-    def set_color(self, color):
-        return self.led.set_color(color)
+    def set_color(self, color, power_percentage=100):
+        return self.led.set_color(color, power_percentage)
+
+    @dbus.service.method("led.service")
+    def pulse_color(self, color, delay=0.5):
+        return self.led.pulse_color(color, delay)
 
     @dbus.service.method("led.service")
     def start_blinker(self, pattern, delay=0.5):
         return self.led.start_blinker(pattern, delay)
 
     @dbus.service.method("led.service")
-    def stop_blinker(self):
-        self.led.stop_blinker()
+    def start_pulser(self, pattern, delay=0.5):
+        return self.led.start_pulser(pattern, delay)
+
+    @dbus.service.method("led.service")
+    def stop(self):
+        self.led.stop()
