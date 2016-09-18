@@ -79,7 +79,7 @@ class GPIO:
         direction = "override-enable" if en else "override-disable"
         self.writeProperty("override_outdir", direction)
 
-    def enableOverrideOutVal(self, en, value = 0):
+    def enableOverrideOutVal(self, en, value=0):
         if en:
             if value:
                 val = "override-high"
@@ -96,14 +96,11 @@ class GPIO:
         self.setValue(current_value)
 
     def initCS(self):
-        #self.unexport() # unexport
-        #self.export() # export
         self.setDir(1)
         self.setPinmux("mode0")
         self.setPullmode("nopull")
         self.enableOverrideOutVal(0)
         self.enableOverrideOutDir(1)
-        #self.enableOverrideOutVal(1)
 
 def test():
     pin1 = GPIO(12)
