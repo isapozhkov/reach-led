@@ -1,0 +1,10 @@
+[Unit]
+Description=ReachLED service
+
+[Service]
+Type=dbus
+BusName=led.service
+ExecStart=/usr/bin/led_daemon
+
+[Install]
+WantedBy=multi-user.target
