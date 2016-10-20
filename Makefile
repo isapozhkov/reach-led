@@ -23,4 +23,5 @@ clean:
 	rm -rf build
 	rm -rf dist
 	rm -rf reachled.egg-info
+deinit:
 	$(call delete_daemon)
