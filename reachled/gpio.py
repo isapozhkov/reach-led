@@ -123,17 +123,17 @@ def test():
     print("Goodbye")
 
     while True:
-    	pin1.setValue(b)
-    	time.sleep(delay)
-    	pin1.setValue(not b)
-    	pin2.setValue(b)
-    	time.sleep(delay)
-    	pin2.setValue(not b)
-    	pin3.setValue(b)
-    	time.sleep(delay)
-    	pin3.setValue(not b)
+        pin1.setValue(b)
+        time.sleep(delay)
+        pin1.setValue(not b)
+        pin2.setValue(b)
+        time.sleep(delay)
+        pin2.setValue(not b)
+        pin3.setValue(b)
+        time.sleep(delay)
+        pin3.setValue(not b)
 
-    	print("Tick!")
+        print("Tick!")
 
 if __name__ == "__main__":
     test()
